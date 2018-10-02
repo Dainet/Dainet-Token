@@ -164,27 +164,33 @@ contract Dainet is BaseToken {
     string public name;
     uint8 public decimals;
     string public symbol;
-    string public version = '1.4';
+    string public version = '1.5';
     uint256 public unitsPerEth;
     uint256 public maxDainSell;
     uint256 public totalEthPos;
     uint256 public minimalEthPos;
+    uint256 public minEthAmount;
 
     constructor() public {
-        decimals = 18;   
-        totalSupply = withDecimals(130000000, decimals); 
-        balances[msg.sender] = totalSupply;
-        emit Transfer(address(0), msg.sender, totalSupply);
-        maxDainSell = div(totalSupply, 2);
         name = "Dainet";
         symbol = "DAIN";
-        unitsPerEth = 1300;
+        decimals = 18;   
+
+        totalSupply = withDecimals(1300000000, decimals); 
+
+        maxDainSell = withDecimals(845000000, decimals); 
+        unitsPerEth = 2000;
+        minEthAmount = withDecimals(5, (18-2)); 
+
+        balances[msg.sender] = totalSupply;
+        emit Transfer(address(0), msg.sender, totalSupply);
     }
 
     function() public payable{
         uint256 amount = mul(msg.value, unitsPerEth);
         require(balances[owner] >= amount);
         require(balances[owner] >= maxDainSell);
+        require(msg.value >= minEthAmount);
 
         balances[owner] = sub(balances[owner], amount);
         maxDainSell = sub(maxDainSell, amount);
